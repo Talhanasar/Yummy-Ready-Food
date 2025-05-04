@@ -45,10 +45,10 @@ const Header = () => {
                     <NavLink className={({ isActive }) => `text-sm font-medium text-white hover:underline underline-offset-4 p-4 lg:p-0 border-b lg:border-b-0 ${isActive ? 'underline' : ''}`} to="/" onClick={toggleMenu}>
                         Home
                     </NavLink>
-                    <NavLink className={({ isActive }) => `text-sm font-medium text-white hover:underline underline-offset-4 p-4 lg:p-0 border-b lg:border-b-0 ${isActive ? 'underline' : ''}`} to="/shop" onClick={toggleMenu}>
+                    <NavLink className={({ isActive }) => `text-sm font-medium text-white hover:underline underline-offset-4 p-4 lg:p-0 border-b lg:border-b-0 ${isActive ? 'underline' : ''}`} to="/" onClick={toggleMenu}>
                         Shop
                     </NavLink>
-                    <NavLink className={({ isActive }) => `text-sm font-medium text-white hover:underline underline-offset-4 p-4 lg:p-0 border-b lg:border-b-0 ${isActive ? 'underline' : ''}`} to="/aboutus" onClick={toggleMenu}>
+                    <NavLink className={({ isActive }) => `text-sm font-medium text-white hover:underline underline-offset-4 p-4 lg:p-0 border-b lg:border-b-0 ${isActive ? 'underline' : ''}`} to="/" onClick={toggleMenu}>
                         About Us
                     </NavLink>
                     {/* {admin.role && <NavLink className={({ isActive }) => `text-sm font-medium text-white hover:underline underline-offset-4 p-4 lg:p-0 border-b lg:border-b-0 ${isActive ? 'underline' : ''}`} to="/admin/dashboard" onClick={toggleMenu}>

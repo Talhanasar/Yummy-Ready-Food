@@ -20,8 +20,8 @@ const Footer = () => {
                     <h4 className="text-lg font-semibold mb-4">MAIN MENU</h4>
                     <ul className="space-y-2 text-sm ">
                         <li><NavLink to="/" className="hover:underline">Home</NavLink></li>
-                        <li><NavLink to="/shop" className="hover:underline">Shop</NavLink></li>
-                        <li><NavLink to="/aboutus" className="hover:underline">About Us</NavLink></li>
+                        <li><NavLink to="/" className="hover:underline">Shop</NavLink></li>
+                        <li><NavLink to="/" className="hover:underline">About Us</NavLink></li>
                     </ul>
                 </div>
 
