@@ -1,38 +1,67 @@
-import { useState } from 'react'
-import { BrowserRouter as Router, Routes, Route, Outlet, useLocation } from 'react-router-dom'
-import Home from './pages/Home'
-import Header from './components/Header'
-import Footer from './components/Footer'
-import ScrollToTop from './components/ScrollToTop'
-import "./index.css";
-
-// Wrapper component for conditional layout
-function Layout() {
-  const location = useLocation();
-  const checkOutPage = location.pathname.includes('/checkout');
-  const isAdminPage = location.pathname.includes('/admin');
-
-  return (
-    <>
-      {!checkOutPage && !isAdminPage && <Header />}
-      <Outlet />
-      {!checkOutPage && !isAdminPage && <Footer />}
-    </>
-  );
-}
+import { RouterProvider, createBrowserRouter } from 'react-router'
+import Applayout from './Applayout'
+import LandingPage from './pages/LandingPage'
+import ShopPage from './pages/ShopPage'
+import AboutUsPage from './pages/AboutUsPage'
+import NotFound from './pages/404Page'
+import ProductDetails from './pages/ProductDetail'
+import CheckoutPage from './pages/CheckoutPage'
+import ConfirmationPage from './pages/ConfirmationPage'
+import AdminPage from './pages/AdminPage'
 
 function App() {
+
+  const router = createBrowserRouter([
+    {
+      path: "/",
+      element: <Applayout/>,
+      errorElement:<NotFound/>,
+      children:([
+        { 
+          path:"/",
+          element:<LandingPage/>
+        },
+        {
+          path:"/shop",
+          element:<ShopPage/>
+        },
+        {
+          path:"/aboutus",
+          element:<AboutUsPage/>
+        },
+        {
+          path:"/product/:name",
+          element:<ProductDetails/>
+        },
+        {
+          path:"/checkout",
+          element:<CheckoutPage/>
+        },
+        {
+          path:"/order-confirmation",
+          element:<ConfirmationPage/>
+        },
+        {
+          path:"/admin/:page",
+          element:<AdminPage/>
+        },
+        {
+          path:"/admin/order/:id",
+          element:<AdminPage/>
+        },
+        {
+          path:"/admin/product/:id",
+          element:<AdminPage/>
+        },
+        {
+          path:"/admin/coupon/:id",
+          element:<AdminPage/>
+        }
+      ])
+    }
+  ])
   return (
-    <Router>
-      <ScrollToTop/>
-      <Routes>
-        <Route element={<Layout />}>
-          <Route path="/" element={<Home />} />
-          {/* Add more routes here as needed */}
-        </Route>
-      </Routes>
-    </Router>
+    <RouterProvider router={router} />
   )
 }
-
 export default App

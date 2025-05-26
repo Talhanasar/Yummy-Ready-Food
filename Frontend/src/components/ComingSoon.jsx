@@ -1,6 +1,6 @@
 import React from 'react';
 import { FaFacebook, FaWhatsapp, FaArrowLeft } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router";
 
 const ComingSoon = () => {
     const navigate = useNavigate();

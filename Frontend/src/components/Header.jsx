@@ -1,19 +1,19 @@
-import { NavLink } from "react-router-dom"
+import { NavLink } from "react-router"
 import { useState } from "react"
 import { Menu, X, ShoppingCart } from "lucide-react"
 import { useCart } from "../contexts/CartContext"
 import SideCart from "./SideCart"
-// import { useAuth } from "../contexts/AuthContext"
+import { useAuth } from "../contexts/AuthContext"
 
 const Header = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false)
-    const { toggleCart } = useCart()
-    // const { admin } = useAuth()
+    const { cart, toggleCart } = useCart()
+    const { admin } = useAuth()
 
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen)
     }
-    // const cartItemCount = cart.length
+    const cartItemCount = cart.length
 
     return (
         <>
@@ -30,8 +30,7 @@ const Header = () => {
                 >
                     <ShoppingCart size={24} />
                     <span className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
-                        0
-                        {/* {cartItemCount} */}
+                        {cartItemCount}
                     </span>
                 </div>
                 <button
@@ -45,15 +44,15 @@ const Header = () => {
                     <NavLink className={({ isActive }) => `text-sm font-medium text-white hover:underline underline-offset-4 p-4 lg:p-0 border-b lg:border-b-0 ${isActive ? 'underline' : ''}`} to="/" onClick={toggleMenu}>
                         Home
                     </NavLink>
-                    <NavLink className={({ isActive }) => `text-sm font-medium text-white hover:underline underline-offset-4 p-4 lg:p-0 border-b lg:border-b-0 `} to="/" onClick={toggleMenu}>
+                    <NavLink className={({ isActive }) => `text-sm font-medium text-white hover:underline underline-offset-4 p-4 lg:p-0 border-b lg:border-b-0 ${isActive ? 'underline' : ''}`} to="/shop" onClick={toggleMenu}>
                         Shop
                     </NavLink>
-                    <NavLink className={({ isActive }) => `text-sm font-medium text-white hover:underline underline-offset-4 p-4 lg:p-0 border-b lg:border-b-0 `} to="/" onClick={toggleMenu}>
+                    <NavLink className={({ isActive }) => `text-sm font-medium text-white hover:underline underline-offset-4 p-4 lg:p-0 border-b lg:border-b-0 ${isActive ? 'underline' : ''}`} to="/aboutus" onClick={toggleMenu}>
                         About Us
                     </NavLink>
-                    {/* {admin.role && <NavLink className={({ isActive }) => `text-sm font-medium text-white hover:underline underline-offset-4 p-4 lg:p-0 border-b lg:border-b-0 ${isActive ? 'underline' : ''}`} to="/admin/dashboard" onClick={toggleMenu}>
+                    {admin.role && <NavLink className={({ isActive }) => `text-sm font-medium text-white hover:underline underline-offset-4 p-4 lg:p-0 border-b lg:border-b-0 ${isActive ? 'underline' : ''}`} to="/admin/dashboard" onClick={toggleMenu}>
                         Admin Panel
-                    </NavLink>} */}
+                    </NavLink>}
                 </nav>
             </header>
             <SideCart/>
