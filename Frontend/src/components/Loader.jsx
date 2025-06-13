@@ -9,7 +9,7 @@ const Loader = ({ size = 'default', fullScreen = false }) => {
   };
 
   const containerClasses = fullScreen
-    ? 'fixed inset-0 flex items-center justify-center bg-white bg-opacity-75 z-50'
+    ? 'fixed inset-0 flex items-center justify-center bg-white/75 z-50'
     : 'flex items-center justify-center p-4';
 
   return (
