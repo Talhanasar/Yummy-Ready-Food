@@ -26,6 +26,9 @@ app.use('/api/product', productRoutes);
 app.use('/api/coupon', couponRoutes);
 app.use('/api/order', orderRoutes);
 app.use('/api/admin', adminRoutes);
+app.get('/health', (req, res) => {
+    res.status(200).json({ message: 'Server is healthy' });
+});
 
 app.use(errorMiddleware);
 const PORT = process.env.PORT || 5000;
