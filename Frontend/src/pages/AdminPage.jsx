@@ -82,7 +82,7 @@ const AdminPageContent = () => {
             case 'dashboard': return <AdminDashboard />;
             case 'coupons': return <AdminCoupons />;
             case 'admins': return <AllAdmins />;
-            case 'delete':
+            case 'logout':
                 localStorage.removeItem('admin');
                 setAdmin({});
                 return <Navigate to="/admin/login" />;
