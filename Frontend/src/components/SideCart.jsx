@@ -100,7 +100,7 @@ export default function SideCart() {
         className={`fixed inset-y-0 right-0 w-full sm:w-1/2 lg:w-1/3 bg-white shadow-lg transform ${isCartOpen ? 'translate-x-0' : 'translate-x-full'} transition-transform duration-300 ease-in-out z-50 overflow-y-auto`}
       >
         <div className="flex flex-col h-full">
-          <div className="flex justify-between items-center p-4 border-b">
+          <div className="flex justify-between items-center p-4 border-b border-black/50">
             <h2 className="text-lg font-semibold">Your Cart</h2>
             <Button onClick={toggleCart} className="text-gray-500 hover:text-gray-700">
               <X size={24} />
@@ -160,7 +160,7 @@ export default function SideCart() {
           </div>
 
           {/* Coupon Code Input */}
-          <div className="p-4 border-t flex justify-center items-center">
+          <div className="p-4 border-t border-black/50 flex justify-center items-center">
             {usedCoupon ? (
               <div className="flex items-center">
                 <div className="bg-green-500 text-white rounded-xl py-1 pl-4 pr-2 text-sm flex justify-between items-center gap-3">
@@ -191,7 +191,7 @@ export default function SideCart() {
           </div>
 
           {/* Total and Discount */}
-          <div className="p-4 border-t">
+          <div className="p-4 border-t border-black/50">
             <div className="flex justify-between items-center mb-4">
               <span className="font-semibold text-lg">Total:</span>
               <span className={`text-lg font-semibold ${discount > 0 ? 'line-through text-gray-500' : ''}`}>{total}৳</span>
