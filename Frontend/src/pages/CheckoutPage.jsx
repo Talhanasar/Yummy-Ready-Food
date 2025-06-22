@@ -40,6 +40,8 @@ const CheckoutPage = () => {
   const [submitting, setSubmitting] = useState(false);
   const [location, setLocation] = useState([22.3462, 91.7956]); 
   const [shouldLocate, setShouldLocate] = useState(false);
+  const [locating, setLocating] = useState(false);
+  const [locationPermission, setLocationPermission] = useState('unknown'); // 'granted', 'denied', 'prompt', 'unknown'
 
   const subtotal = cart.reduce((total, item) => total + item.price * item.quantity, 0);
   const shippingCost = 50;
@@ -61,24 +63,95 @@ const CheckoutPage = () => {
     }
   }, [cart]);
 
-  const requestLocation = useCallback(() => {
-    if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          setLocation([latitude, longitude]);
-          setShouldLocate(true);
-        },
-        (error) => {
-          console.error("Error getting location:", error);
-          toast.error("Unable to get your current location. Please try again or select manually.");
-        },
-        { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
-      );
-    } else {
-      toast.error("Geolocation is not supported by your browser");
-    }
+  // Check location permission on component mount
+  useEffect(() => {
+    const checkLocationPermission = async () => {
+      if ('permissions' in navigator) {
+        try {
+          const permission = await navigator.permissions.query({ name: 'geolocation' });
+          setLocationPermission(permission.state);
+          
+          // Listen for permission changes
+          permission.onchange = () => {
+            setLocationPermission(permission.state);
+          };
+        } catch (error) {
+          console.log('Permission API not supported');
+          setLocationPermission('unknown');
+        }
+      }
+    };
+    
+    checkLocationPermission();
   }, []);
+
+  const requestLocation = useCallback(() => {
+    // Check if location services are likely disabled
+    if (locationPermission === 'denied') {
+      toast.error("Location access is blocked. Please enable location services in your browser settings.");
+      setTimeout(() => {
+        toast.info("💡 Click the location icon in your browser's address bar and select 'Allow'");
+      }, 1500);
+      return;
+    }
+
+    if (!("geolocation" in navigator)) {
+      toast.error("Geolocation is not supported by your browser. Please select your location manually on the map.");
+      return;
+    }
+
+    setLocating(true);
+    
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        setLocation([latitude, longitude]);
+        setShouldLocate(true);
+        setLocating(false);
+        setLocationPermission('granted');
+        toast.success("📍 Location found successfully!");
+      },
+      (error) => {
+        console.error("Error getting location:", error);
+        setLocating(false);
+        
+        let errorMessage = "";
+        let helpMessage = "";
+        
+        switch(error.code) {
+          case error.PERMISSION_DENIED:
+            setLocationPermission('denied');
+            errorMessage = "🚫 Location access denied. Please enable location services to use this feature.";
+            helpMessage = "💡 To enable: Click the location icon (🔒) in your browser's address bar → Select 'Allow location access'";
+            break;
+          case error.POSITION_UNAVAILABLE:
+            errorMessage = "📡 Location information is unavailable. Please check your internet connection and GPS.";
+            helpMessage = "💡 Try: Turn on GPS/Location services in your device settings and refresh the page";
+            break;
+          case error.TIMEOUT:
+            errorMessage = "⏱️ Location request timed out. Please try again.";
+            helpMessage = "💡 Tip: Make sure you're in an area with good GPS signal";
+            break;
+          default:
+            errorMessage = "❌ An unknown error occurred while getting your location.";
+            helpMessage = "💡 Try refreshing the page or selecting your location manually on the map";
+            break;
+        }
+        
+        toast.error(errorMessage);
+        
+        // Show help message after a delay
+        setTimeout(() => {
+          toast.info(helpMessage);
+        }, 2000);
+      },
+      { 
+        enableHighAccuracy: true, 
+        timeout: 15000, // Increased timeout to 15 seconds
+        maximumAge: 300000 // 5 minutes cache
+      }
+    );
+  }, [locationPermission]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -127,6 +200,7 @@ const CheckoutPage = () => {
     useMapEvents({
       click(e) {
         setLocation([e.latlng.lat, e.latlng.lng]);
+        toast.success("📍 Location updated on map!");
       },
     });
 
@@ -243,8 +317,9 @@ const CheckoutPage = () => {
               <div className="relative flex items-center">
                 <MapPin className="mr-2 text-gray-400" />
                 <div className="w-full">
-                  <label htmlFor="map" className="block text-sm font-medium text-gray-700 mb-1">Select Your Location(Optional)</label>
-                  <div className="w-full h-64">
+                  <label htmlFor="map" className="block text-sm font-medium text-gray-700 mb-1">Select Your Location (Optional)</label>
+                  <p className="text-xs text-gray-500 mb-2">📍 Click anywhere on the map to set your delivery location, or use the button below to get your current location</p>
+                  <div className="w-full h-64 border-2 border-gray-200 rounded-lg overflow-hidden">
                     <MapContainer
                       center={location}
                       zoom={13}
@@ -258,8 +333,63 @@ const CheckoutPage = () => {
                       <CurrentLocationMarker />
                     </MapContainer>
                   </div>
-                  <div onClick={requestLocation} className="mt-2 cursor-pointer bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-md w-max">
-                    Use My Current Location
+                  <div className="mt-2 flex flex-col gap-2">
+                    <div 
+                      onClick={locating ? undefined : requestLocation} 
+                      className={`cursor-pointer px-4 py-2 rounded-md text-white flex items-center gap-2 transition-all duration-200 ${
+                        locating 
+                          ? 'bg-gray-400 cursor-not-allowed' 
+                          : locationPermission === 'denied'
+                          ? 'bg-red-500 hover:bg-red-600'
+                          : 'bg-orange-500 hover:bg-orange-600'
+                      }`}
+                    >
+                      {locating ? (
+                        <>
+                          <Loader size="small" />
+                          <span>Getting Location...</span>
+                        </>
+                      ) : locationPermission === 'denied' ? (
+                        <>
+                          <MapPin size={16} />
+                          <span>Enable Location Access</span>
+                        </>
+                      ) : (
+                        <>
+                          <MapPin size={16} />
+                          <span>Use My Current Location</span>
+                        </>
+                      )}
+                    </div>
+                    
+                    {/* Location Status Indicator */}
+                    <div className="text-xs space-y-1">
+                      <div className="flex items-center gap-1">
+                        {locationPermission === 'granted' && (
+                          <span className="text-green-600 flex items-center gap-1">
+                            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                            Location access enabled
+                          </span>
+                        )}
+                        {locationPermission === 'denied' && (
+                          <span className="text-red-600 flex items-center gap-1">
+                            <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                            Location access blocked
+                          </span>
+                        )}
+                        {locationPermission === 'prompt' && (
+                          <span className="text-yellow-600 flex items-center gap-1">
+                            <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                            Click to allow location access
+                          </span>
+                        )}
+                      </div>
+                      
+                      {/* Current coordinates display */}
+                      <div className="text-gray-500 font-mono text-xs">
+                        📍 Current: {location[0].toFixed(6)}, {location[1].toFixed(6)}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
